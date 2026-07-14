@@ -1,63 +1,85 @@
 import * as noteModel from '../models/noteModel.js'
 
-export function getNotes(req, res) {
-  const notes = noteModel.getAllNotes()
+export async function getNotes(req, res) {
+  try {
+    const notes = await noteModel.getAllNotes()
 
-  return res.json(notes)
-}
-
-export function addNote(req, res) {
-  const { title, body, category, date } = req.body
-
-  if (!title || !body || !category) {
-    return res.status(400).json({
-      message: 'Title, body and category are required',
+    return res.json(notes)
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to get notes',
+      error: error.message,
     })
   }
-
-  const newNote = noteModel.createNote({
-    title,
-    body,
-    category,
-    date: date || 'Today',
-  })
-
-  return res.status(201).json({
-    message: 'Note added successfully',
-    note: newNote,
-  })
 }
 
-export function editNote(req, res) {
-  const { id } = req.params
+export async function addNote(req, res) {
+  try {
+    const { title, body, category, date } = req.body
 
-  const updatedNote = noteModel.updateNote(id, req.body)
+    const newNote = await noteModel.createNote({
+      title,
+      body,
+      category,
+      date: date || 'Today',
+    })
 
-  if (!updatedNote) {
-    return res.status(404).json({
-      message: 'Note not found',
+    return res.status(201).json({
+      message: 'Note added successfully',
+      note: newNote,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to add note',
+      error: error.message,
     })
   }
-
-  return res.json({
-    message: 'Note updated successfully',
-    note: updatedNote,
-  })
 }
 
-export function removeNote(req, res) {
-  const { id } = req.params
+export async function editNote(req, res) {
+  try {
+    const { id } = req.params
 
-  const deletedNote = noteModel.deleteNote(id)
+    const updatedNote = await noteModel.updateNote(id, req.body)
 
-  if (!deletedNote) {
-    return res.status(404).json({
-      message: 'Note not found',
+    if (!updatedNote) {
+      return res.status(404).json({
+        message: 'Note not found',
+      })
+    }
+
+    return res.json({
+      message: 'Note updated successfully',
+      note: updatedNote,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to update note',
+      error: error.message,
     })
   }
+}
 
-  return res.json({
-    message: 'Note deleted successfully',
-    note: deletedNote,
-  })
+export async function removeNote(req, res) {
+  try {
+    const { id } = req.params
+
+    const deletedNote = await noteModel.deleteNote(id)
+
+    if (!deletedNote) {
+      return res.status(404).json({
+        message: 'Note not found',
+      })
+    }
+
+    return res.json({
+      message: 'Note deleted successfully',
+      note: deletedNote,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to delete note',
+      error: error.message,
+    })
+  }
 } 
