@@ -5,15 +5,16 @@ import {
   noteUpdateRules,
   validateNote,
 } from '../validators/noteValidator.js'
+import authenticate from '../middleware/auth.js'
 
 const router = express.Router()
 
 router.get('/', noteController.getNotes)
 
-router.post('/', noteRules, validateNote, noteController.addNote)
+router.post('/', authenticate, noteRules, validateNote, noteController.addNote)
 
-router.put('/:id', noteUpdateRules, validateNote, noteController.editNote)
+router.put('/:id', authenticate, noteUpdateRules, validateNote, noteController.editNote)
 
-router.delete('/:id', noteController.removeNote)
+router.delete('/:id', authenticate, noteController.removeNote)
 
 export default router 
