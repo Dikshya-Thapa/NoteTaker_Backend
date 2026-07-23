@@ -2,7 +2,7 @@ import * as noteModel from '../models/noteModel.js'
 
 export async function getNotes(req, res) {
   try {
-    const notes = await noteModel.getAllNotes()
+    const notes = await noteModel.getAllNotes(req.user.userId)
 
     return res.json(notes)
   } catch (error) {
@@ -18,6 +18,7 @@ export async function addNote(req, res) {
     const { title, body, category, date } = req.body
 
     const newNote = await noteModel.createNote({
+      user: req.user.userId,
       title,
       body,
       category,
@@ -40,7 +41,11 @@ export async function editNote(req, res) {
   try {
     const { id } = req.params
 
-    const updatedNote = await noteModel.updateNote(id, req.body)
+    const updatedNote = await noteModel.updateNote(
+      id,
+      req.user.userId,
+      req.body,
+    )
 
     if (!updatedNote) {
       return res.status(404).json({
@@ -64,7 +69,7 @@ export async function removeNote(req, res) {
   try {
     const { id } = req.params
 
-    const deletedNote = await noteModel.deleteNote(id)
+    const deletedNote = await noteModel.deleteNote(id, req.user.userId)
 
     if (!deletedNote) {
       return res.status(404).json({
