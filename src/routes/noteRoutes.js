@@ -9,7 +9,7 @@ import authenticate from '../middleware/auth.js'
 
 const router = express.Router()
 
-router.get('/', noteController.getNotes)
+router.get('/', authenticate, noteController.getNotes)
 
 router.post('/', authenticate, noteRules, validateNote, noteController.addNote)
 
