@@ -1,7 +1,7 @@
 import Note from '../../data/note.js'
 
-export async function getAllNotes() {
-  const notes = await Note.find().sort({ createdAt: -1 })
+export async function getAllNotes(userId) {
+  const notes = await Note.find({ user: userId }).sort({ createdAt: -1 })
 
   return notes
 }
@@ -12,17 +12,21 @@ export async function createNote(noteData) {
   return newNote
 }
 
-export async function updateNote(id, updatedData) {
-  const updatedNote = await Note.findByIdAndUpdate(id, updatedData, {
-    new: true,
-    runValidators: true,
-  })
+export async function updateNote(id, userId, updatedData) {
+  const updatedNote = await Note.findOneAndUpdate(
+    { _id: id, user: userId },
+    updatedData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
 
   return updatedNote
 }
 
-export async function deleteNote(id) {
-  const deletedNote = await Note.findByIdAndDelete(id)
+export async function deleteNote(id, userId) {
+  const deletedNote = await Note.findOneAndDelete({ _id: id, user: userId })
 
   return deletedNote
 } 
